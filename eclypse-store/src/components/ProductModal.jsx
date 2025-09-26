@@ -1,26 +1,41 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Card, CardContent } from '@/components/ui/card.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
-import { Separator } from '@/components/ui/separator.jsx'
-import { X, Heart, Share2, Star, ShoppingCart, Sun, Moon, Truck, Shield, Recycle } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { X, Heart, Share2, Star, ShoppingCart, Truck, Shield, Recycle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
-  const [selectedSize, setSelectedSize] = useState('M')
-  const [selectedColor, setSelectedColor] = useState('Preto')
-  const [quantity, setQuantity] = useState(1)
-  const [isFavorite, setIsFavorite] = useState(false)
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedColor, setSelectedColor] = useState('Preto');
+  const [quantity, setQuantity] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [mainImage, setMainImage] = useState(product?.image);
 
-  const sizes = ['XS', 'S', 'M', 'L', 'XL']
-  const colors = ['Preto', 'Branco', 'Cinza']
+  useEffect(() => {
+    if (product) {
+      setMainImage(product.image);
+    }
+  }, [product]);
+
+  const sizes = ['XS', 'S', 'M', 'L', 'XL'];
+  const colors = ['Preto', 'Branco', 'Cinza'];
 
   const features = [
     { icon: Truck, text: 'Envio grátis acima de €50' },
     { icon: Shield, text: 'Garantia de qualidade' },
     { icon: Recycle, text: 'Materiais sustentáveis' }
-  ]
+  ];
 
-  if (!isOpen || !product) return null
+  if (!isOpen || !product) return null;
+
+  // Para a galeria, podemos usar a imagem principal e adicionar variações se existirem
+  const galleryImages = [
+    product.image,
+    // Exemplo de como adicionar mais imagens se existirem variações
+    // `/src/assets/${product.id}-variation1.png`,
+    // `/src/assets/${product.id}-variation2.png`,
+  ];
 
   const handleAddToCart = () => {
     const productWithOptions = {
@@ -28,10 +43,10 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
       selectedSize,
       selectedColor,
       quantity
-    }
-    onAddToCart(productWithOptions)
-    onClose()
-  }
+    };
+    onAddToCart(productWithOptions);
+    onClose();
+  };
 
   const handleShare = () => {
     if (navigator.share) {
@@ -39,35 +54,40 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
         title: product.name,
         text: product.description,
         url: window.location.href
-      })
+      });
     } else {
-      navigator.clipboard.writeText(window.location.href)
-      alert('Link copiado para a área de transferência!')
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copiado para a área de transferência!');
     }
-  }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-black rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex flex-col lg:flex-row h-full">
-          {/* Product Image */}
-          <div className="lg:w-1/2 bg-gradient-to-br from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 flex items-center justify-center relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute top-4 right-4 z-10 bg-white/10 backdrop-blur-sm"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <div className="relative">
-              <Sun className="h-32 w-32 opacity-30 absolute animate-pulse" />
-              <Moon className="h-32 w-32 opacity-50" />
-            </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[825px] p-0">
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 text-muted-foreground hover:text-foreground">
+          <X size={24} />
+        </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+          {/* Product Image and Gallery */}
+          <div className="p-4 bg-card-foreground/5 rounded-l-lg flex flex-col justify-between">
+            <img src={mainImage} alt={product.name} className="w-full h-auto object-cover rounded-lg shadow-lg mb-4" />
+            {galleryImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {galleryImages.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`${product.name} - view ${index + 1}`}
+                    className={`w-full h-20 object-cover rounded-md cursor-pointer border-2 ${mainImage === img ? 'border-primary' : 'border-transparent'}`}
+                    onClick={() => setMainImage(img)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Details */}
-          <div className="lg:w-1/2 p-6 overflow-y-auto">
+          <div className="p-6 overflow-y-auto">
             <div className="space-y-6">
               {/* Header */}
               <div>
@@ -87,29 +107,29 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
                     </Button>
                   </div>
                 </div>
-                <h1 className="text-2xl font-light mb-2">{product.name}</h1>
+                <DialogTitle className="text-3xl font-bold mb-2">{product.name}</DialogTitle>
                 <div className="flex items-center space-x-2 mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-current text-yellow-400" />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-500">(24 avaliações)</span>
+                  <span className="text-sm text-muted-foreground">(24 avaliações)</span>
                 </div>
-                <p className="text-3xl font-light">€{product.price.toFixed(2)}</p>
+                <p className="text-4xl font-bold">€{product.price.toFixed(2)}</p>
               </div>
 
               <Separator />
 
               {/* Description */}
               <div>
-                <h3 className="font-medium mb-2">Descrição</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <h3 className="font-semibold mb-2">Descrição</h3>
+                <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
                   {product.description}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2">
-                  Cada peça é única, criada artesanalmente seguindo os princípios do slow fashion. 
-                  Utilizamos apenas materiais sustentáveis e técnicas tradicionais que respeitam 
+                </DialogDescription>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+                  Cada peça é única, criada artesanalmente seguindo os princípios do slow fashion.
+                  Utilizamos apenas materiais sustentáveis e técnicas tradicionais que respeitam
                   o meio ambiente e valorizam o trabalho artesanal.
                 </p>
               </div>
@@ -118,7 +138,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
 
               {/* Size Selection */}
               <div>
-                <h3 className="font-medium mb-3">Tamanho</h3>
+                <h3 className="font-semibold mb-3">Tamanho</h3>
                 <div className="flex space-x-2">
                   {sizes.map((size) => (
                     <Button
@@ -136,7 +156,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
 
               {/* Color Selection */}
               <div>
-                <h3 className="font-medium mb-3">Cor</h3>
+                <h3 className="font-semibold mb-3">Cor</h3>
                 <div className="flex space-x-2">
                   {colors.map((color) => (
                     <Button
@@ -154,7 +174,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
 
               {/* Quantity */}
               <div>
-                <h3 className="font-medium mb-3">Quantidade</h3>
+                <h3 className="font-semibold mb-3">Quantidade</h3>
                 <div className="flex items-center space-x-3">
                   <Button
                     variant="outline"
@@ -178,11 +198,11 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
 
               {/* Features */}
               <div>
-                <h3 className="font-medium mb-3">Vantagens</h3>
+                <h3 className="font-semibold mb-3">Vantagens</h3>
                 <div className="space-y-2">
                   {features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-sm">
-                      <feature.icon className="h-4 w-4 text-green-500" />
+                    <div key={index} className="flex items-center space-x-2 text-sm text-muted-foreground">
+                      <feature.icon className="h-4 w-4 text-primary" />
                       <span>{feature.text}</span>
                     </div>
                   ))}
@@ -190,23 +210,24 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
               </div>
 
               {/* Add to Cart */}
-              <div className="space-y-3">
+              <div className="space-y-3 mt-6">
                 <Button
                   onClick={handleAddToCart}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                   size="lg"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Adicionar ao Carrinho
                 </Button>
-                <p className="text-xs text-center text-gray-500">
+                <p className="text-xs text-center text-muted-foreground">
                   Entrega estimada: 3-5 dias úteis
                 </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  )
+      </DialogContent>
+    </Dialog>
+  );
 }
+

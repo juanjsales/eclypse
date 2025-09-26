@@ -239,3 +239,54 @@ h1, h2, h3, h4, h5, h6 {
 .btn-eclipse:hover::before {
   left: 100%;
 }
+
+
+
+/* Animações e Transições */
+.card-eclipse {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card-eclipse:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-eclipse {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-in-out forwards;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 10s linear infinite;
+}
+
+.animate-eclipse {
+  animation: eclipse 5s ease-in-out infinite alternate;
+}
+
+@keyframes eclipse {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
