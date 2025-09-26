@@ -1,20 +1,149 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Sun, Moon, Search, X, Star, Filter, Grid, List } from 'lucide-react';
+import { ShoppingCart, Sun, Moon, Search, X, Star, Filter, Grid, List, Home, Phone, User } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './components/ui/sheet';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './components/ui/card';
 import { Input } from './components/ui/input';
 import { Badge } from './components/ui/badge';
 import { ProductModal } from './components/ProductModal';
+import { ContactPage } from './components/ContactPage';
+import { ProductPage } from './components/ProductPage';
+import { ProfilePage } from './components/ProfilePage';
+import { CheckoutPage } from './components/CheckoutPage';
+import { OrderConfirmationPage } from './components/OrderConfirmationPage';
+import { BlogPage } from './components/BlogPage';
+import { BlogPostPage } from './components/BlogPostPage';
+import { AuthModal } from './components/AuthModal';
+import { LanguageSelector } from './components/LanguageSelector';
+import { LazyImage } from './components/LazyImage';
+import { Router, Route, Link } from './components/Router';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { StockProvider, useStock } from './contexts/StockContext';
+import { I18nProvider, useI18n } from './contexts/I18nContext';
 import productsData from './products'; // Importar os produtos do ficheiro products.js
 import './App.css';
 
-function App() {
+function HomePage({ navigate, theme, cartItems, searchTerm, setSearchTerm, toggleTheme, addToast, addToCart, removeFromCart, updateQuantity, calculateTotal, selectedCategory, setSelectedCategory, filteredProducts, featuredProducts, openProductModal, selectedProduct, isModalOpen, closeProductModal, toasts, removeToast }) {
+  return (
+    <>
+      <main className="container mx-auto px-4 py-8" role="main">
+        {/* Secção de Destaques/Novidades */}
+        <section className="mb-12" aria-labelledby="featured-products-heading">
+          <h2 id="featured-products-heading" className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {featuredProducts.map((product) => (
+              <Card
+                key={product.id}
+                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                onClick={() => navigate(`/produto/${product.id}`)}
+                role="article"
+                aria-label={`Produto em destaque: ${product.name}`}
+              >
+                <CardHeader className="p-0">
+                  <LazyImage
+                    src={product.image}
+                    alt={`Imagem do produto ${product.name}`}
+                    className="w-full h-64 object-cover"
+                  />
+                </CardHeader>
+                <CardContent className="p-4">
+                  <CardTitle className="text-xl font-semibold mb-2">{product.name}</CardTitle>
+                  <CardDescription className="text-muted-foreground text-sm line-clamp-2">
+                    {product.description}
+                  </CardDescription>
+                </CardContent>
+                <CardFooter className="flex justify-between items-center p-4 pt-0">
+                  <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
+                  <Button onClick={(e) => { e.stopPropagation(); addToCart(product); }} aria-label={`Adicionar ${product.name} ao carrinho`}>Adicionar</Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12" aria-labelledby="collection-heading">
+          <h2 id="collection-heading" className="text-4xl font-extrabold text-center mb-8">Coleção ({filteredProducts.length} produtos)</h2>
+          <div className="flex justify-center mb-8 space-x-4" role="group" aria-label="Filtrar produtos por categoria">
+            {['Todos', ...new Set(productsData.map(product => product.category))].map(category => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory(category)}
+                aria-pressed={selectedCategory === category}
+                aria-label={`Mostrar produtos da categoria ${category}`}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredProducts.map((product) => (
+              <Card
+                key={product.id}
+                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                onClick={() => navigate(`/produto/${product.id}`)}
+                role="article"
+                aria-label={`Produto: ${product.name}`}
+              >
+                <CardHeader className="p-0">
+                  <LazyImage
+                    src={product.image}
+                    alt={`Imagem do produto ${product.name}`}
+                    className="w-full h-64 object-cover"
+                  />
+                </CardHeader>
+                <CardContent className="p-4">
+                  <CardTitle className="text-xl font-semibold mb-2">{product.name}</CardTitle>
+                  <CardDescription className="text-muted-foreground text-sm line-clamp-2">
+                    {product.description}
+                  </CardDescription>
+                </CardContent>
+                <CardFooter className="flex justify-between items-center p-4 pt-0">
+                  <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
+                  <Button onClick={(e) => { e.stopPropagation(); addToCart(product); }} aria-label={`Adicionar ${product.name} ao carrinho`}>Adicionar</Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Nova Secção: Sobre Nós */}
+        <section className="py-16 bg-card rounded-lg shadow-lg px-8 mb-12" aria-labelledby="about-us-heading">
+          <h2 id="about-us-heading" className="text-4xl font-extrabold text-center mb-8">Sobre a Eclypse</h2>
+          <div className="max-w-3xl mx-auto text-center text-lg text-muted-foreground leading-relaxed">
+            <p className="mb-4">
+              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground">slow fashion</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground">arte com as mãos</strong>.
+            </p>
+            <p className="mb-4">
+              A nossa inspiração vem da dualidade entre a luz e a sombra, o visível e o invisível, refletida nos fenómenos celestiais como os eclipses e as fases da lua. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
+            </p>
+            <p>
+              Comprometemo-nos com a sustentabilidade e a produção ética, garantindo que cada criação não só embeleza, mas também respeita o planeta e as pessoas. Junte-se a nós nesta jornada onde <strong className="text-foreground">o invisível molda o visível</strong>.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={closeProductModal}
+        product={selectedProduct}
+        onAddToCart={addToCart} // Passar addToCart para o modal
+      />
+    </>
+  );
+}
+
+function AppContent() {
+  const { user, isAuthenticated } = useAuth();
+  const { getStockStatus, getStockMessage, isInStock } = useStock();
+  const { t, formatCurrency } = useI18n();
   const [theme, setTheme] = useState('dark');
   const [cartItems, setCartItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [viewMode, setViewMode] = useState('grid');
   const [toasts, setToasts] = useState([]);
@@ -80,6 +209,10 @@ function App() {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const categories = ['Todos', ...new Set(productsData.map(product => product.category))];
 
   const featuredProducts = productsData.slice(0, 3); // Seleciona os 3 primeiros produtos como destaque
@@ -103,221 +236,245 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="container mx-auto px-4 py-6 flex justify-between items-center border-b border-border">
-        <h1 className="text-3xl font-bold">Eclypse</h1>
-        <nav className="flex items-center space-x-4">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Pesquisar produtos..."
-              className="pl-10 pr-4 py-2 rounded-full border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-            {searchTerm && (
+      <Router>
+        <header className="container mx-auto px-4 py-6 flex justify-between items-center border-b border-border" role="banner">
+          <h1 className="text-3xl font-bold">
+            <Link to="/" aria-label="Página inicial da Eclypse">Eclypse</Link>
+          </h1>
+          <nav className="flex items-center space-x-4" aria-label="Navegação principal">
+            <Link to="/" className="flex items-center space-x-1 text-muted-foreground hover:text-foreground transition-colors">
+              <Home size={20} />
+              <span className="hidden sm:inline">Início</span>
+            </Link>
+            <Link to="/contacto" className="flex items-center space-x-1 text-muted-foreground hover:text-foreground transition-colors">
+              <Phone size={20} />
+              <span className="hidden sm:inline">{t('nav.contact')}</span>
+            </Link>
+            <Link to="/blog" className="flex items-center space-x-1 text-muted-foreground hover:text-foreground transition-colors">
+              <span className="hidden sm:inline">{t('nav.blog')}</span>
+            </Link>
+            {isAuthenticated ? (
+              <Link to="/perfil" className="flex items-center space-x-1 text-muted-foreground hover:text-foreground transition-colors">
+                <User size={20} />
+                <span className="hidden sm:inline">{user?.name?.split(' ')[0]}</span>
+              </Link>
+            ) : (
               <Button
                 variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
-                onClick={() => setSearchTerm('')}
+                size="sm"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="flex items-center space-x-1"
               >
-                <X size={16} />
+                <User size={20} />
+                <span className="hidden sm:inline">Entrar</span>
               </Button>
             )}
-          </div>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
-          </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart size={24} />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                    {cartItems.reduce((total, item) => total + item.quantity, 0)}
-                  </span>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full sm:w-[400px] flex flex-col">
-              <SheetHeader>
-                <SheetTitle className="text-2xl">Carrinho de Compras</SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto py-4">
-                {cartItems.length === 0 ? (
-                  <p className="text-center text-muted-foreground">O seu carrinho está vazio.</p>
-                ) : (
-                  <ul className="space-y-4">
-                    {cartItems.map((item) => (
-                      <li key={item.id} className="flex items-center space-x-4">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                        <div className="flex-1">
-                          <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-muted-foreground text-sm">€{item.price.toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                          >
-                            -
-                          </Button>
-                          <span>{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
-                            +
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)}>
-                            <X size={16} />
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              {cartItems.length > 0 && (
-                <div className="border-t border-border pt-4">
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
-                    <span>€{calculateTotal()}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">Envio: Grátis</p>
-                  <Button className="w-full mt-4">Finalizar Compra</Button>
-                </div>
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Pesquisar produtos..."
+                className="pl-10 pr-4 py-2 rounded-full border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Campo de pesquisa de produtos"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} aria-hidden="true" />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Limpar pesquisa"
+                >
+                  <X size={16} />
+                </Button>
               )}
-            </SheetContent>
-          </Sheet>
-        </nav>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {/* Secção de Destaques/Novidades */}
-        <section className="mb-12">
-          <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                onClick={() => openProductModal(product)}
-              >
-                <CardHeader className="p-0">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-64 object-cover"
-                  />
-                </CardHeader>
-                <CardContent className="p-4">
-                  <CardTitle className="text-xl font-semibold mb-2">{product.name}</CardTitle>
-                  <CardDescription className="text-muted-foreground text-sm line-clamp-2">
-                    {product.description}
-                  </CardDescription>
-                </CardContent>
-                <CardFooter className="flex justify-between items-center p-4 pt-0">
-                  <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
-                  <Button onClick={(e) => { e.stopPropagation(); addToCart(product); }}>Adicionar</Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-4xl font-extrabold text-center mb-8">Coleção ({filteredProducts.length} produtos)</h2>
-          <div className="flex justify-center mb-8 space-x-4">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-          <div className={`grid gap-8 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 max-w-2xl mx-auto'}`}>
-            {filteredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                onClick={() => openProductModal(product)}
-              >
-                <CardHeader className="p-0">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-64 object-cover"
-                  />
-                </CardHeader>
-                <CardContent className="p-4">
-                  <CardTitle className="text-xl font-semibold mb-2">{product.name}</CardTitle>
-                  <CardDescription className="text-muted-foreground text-sm line-clamp-2">
-                    {product.description}
-                  </CardDescription>
-                </CardContent>
-                <CardFooter className="flex justify-between items-center p-4 pt-0">
-                  <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
-                  <Button onClick={(e) => { e.stopPropagation(); addToCart(product); }}>Adicionar</Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Nova Secção: Sobre Nós */}
-        <section className="py-16 bg-card rounded-lg shadow-lg px-8 mb-12">
-          <h2 className="text-4xl font-extrabold text-center mb-8">Sobre a Eclypse</h2>
-          <div className="max-w-3xl mx-auto text-center text-lg text-muted-foreground leading-relaxed">
-            <p className="mb-4">
-              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground">slow fashion</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground">arte com as mãos</strong>.
-            </p>
-            <p className="mb-4">
-              A nossa inspiração vem da dualidade entre a luz e a sombra, o visível e o invisível, refletida nos fenómenos celestiais como os eclipses e as fases da lua. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
-            </p>
-            <p>
-              Comprometemo-nos com a sustentabilidade e a produção ética, garantindo que cada criação não só embeleza, mas também respeita o planeta e as pessoas. Junte-se a nós nesta jornada onde <strong className="text-foreground">o invisível molda o visível</strong>.
-            </p>
-          </div>
-        </section>
-      </main>
-
-      <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
-        <p>&copy; {new Date().getFullYear()} Eclypse. Todos os direitos reservados.</p>
-      </footer>
-
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={closeProductModal}
-        product={selectedProduct}
-        onAddToCart={addToCart} // Passar addToCart para o modal
-      />
-
-      {/* Toast Notifications */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`p-4 rounded-lg shadow-lg text-white ${toast.type === 'success' ? 'bg-green-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-700'}`}
-          >
-            <div className="flex justify-between items-center">
-              <span>{toast.message}</span>
-              <Button variant="ghost" size="icon" onClick={() => removeToast(toast.id)} className="text-white hover:bg-white/20">
-                <X size={16} />
-              </Button>
             </div>
-          </div>
+            <LanguageSelector variant="compact" size="sm" />
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}>
+              {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative" aria-label="Abrir carrinho de compras">
+                  <ShoppingCart size={24} />
+                  {cartItems.length > 0 && (
+                    <>
+                      <span className="sr-only">{cartItems.reduce((total, item) => total + item.quantity, 0)} itens no carrinho</span>
+                      <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs" aria-hidden="true">
+                        {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                      </span>
+                    </>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:w-[400px] flex flex-col" role="dialog" aria-modal="true" aria-label="Carrinho de Compras">
+                <SheetHeader>
+                  <SheetTitle className="text-2xl">Carrinho de Compras</SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto py-4">
+                  {cartItems.length === 0 ? (
+                    <p className="text-center text-muted-foreground">O seu carrinho está vazio.</p>
+                  ) : (
+                    <ul className="space-y-4" role="list">
+                      {cartItems.map((item) => (
+                        <li key={item.id} className="flex items-center space-x-4" role="listitem">
+                          <LazyImage src={item.image} alt={`Imagem do produto ${item.name}`} className="w-16 h-16 object-cover rounded-md" />
+                          <div className="flex-1">
+                            <h3 className="font-semibold">{item.name}</h3>
+                            <p className="text-muted-foreground text-sm">€{item.price.toFixed(2)}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              aria-label={`Diminuir quantidade de ${item.name}`}
+                            >
+                              -
+                            </Button>
+                            <span aria-live="polite" aria-atomic="true">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              aria-label={`Aumentar quantidade de ${item.name}`}
+                            >
+                              +
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} aria-label={`Remover ${item.name} do carrinho`}>
+                              <X size={16} />
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {cartItems.length > 0 && (
+                  <div className="border-t border-border pt-4">
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>Total:</span>
+                      <span>€{calculateTotal()}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Envio: Grátis</p>
+                    <Button 
+                    className="w-full mt-4" 
+                    onClick={() => navigate('/checkout')}
+                    aria-label="Finalizar Compra"
+                  >
+                    Finalizar Compra
+                  </Button>
+                  </div>
+                )}
+              </SheetContent>
+            </Sheet>
+          </nav>
+        </header>
+
+        <Route 
+          path="/" 
+          component={HomePage} 
+          theme={theme}
+          cartItems={cartItems}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          toggleTheme={toggleTheme}
+          addToast={addToast}
+          addToCart={addToCart}
+          removeFromCart={removeFromCart}
+          updateQuantity={updateQuantity}
+          calculateTotal={calculateTotal}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          filteredProducts={filteredProducts}
+          featuredProducts={featuredProducts}
+          openProductModal={openProductModal}
+          selectedProduct={selectedProduct}
+          isModalOpen={isModalOpen}
+          closeProductModal={closeProductModal}
+          toasts={toasts}
+          removeToast={removeToast}
+        />
+        <Route path="/contacto" component={ContactPage} addToast={addToast} />
+        <Route path="/blog" component={BlogPage} />
+        <Route path="/perfil" component={ProfilePage} addToast={addToast} addToCart={addToCart} />
+        <Route 
+          path="/checkout" 
+          component={CheckoutPage} 
+          cartItems={cartItems}
+          calculateTotal={calculateTotal}
+          clearCart={clearCart}
+          addToast={addToast}
+        />
+        
+        {/* Dynamic Order Confirmation Routes */}
+        <Route 
+          path="/encomenda-confirmada/:orderId" 
+          component={OrderConfirmationPage}
+        />
+        
+        {/* Dynamic Blog Post Routes */}
+        <Route 
+          path="/blog/:postSlug" 
+          component={BlogPostPage}
+        />
+        
+        {/* Dynamic Product Routes */}
+        {productsData.map(product => (
+          <Route 
+            key={product.id}
+            path={`/produto/${product.id}`} 
+            component={ProductPage} 
+            productId={product.id}
+            addToCart={addToCart}
+            addToast={addToast}
+          />
         ))}
-      </div>
+
+        {/* Auth Modal */}
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+          addToast={addToast} 
+        />
+
+        <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border" role="contentinfo">
+          <p>&copy; {new Date().getFullYear()} Eclypse. Todos os direitos reservados.</p>
+        </footer>
+
+        {/* Toast Notifications */}
+        <div className="fixed bottom-4 right-4 z-50 space-y-2" role="status" aria-live="polite">
+          {toasts.map((toast) => (
+            <div
+              key={toast.id}
+              className={`p-4 rounded-lg shadow-lg text-white ${toast.type === 'success' ? 'bg-green-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-gray-700'}`}
+            >
+              <div className="flex justify-between items-center">
+                <span>{toast.message}</span>
+                <Button variant="ghost" size="icon" onClick={() => removeToast(toast.id)} className="text-white hover:bg-white/20" aria-label="Fechar notificação">
+                  <X size={16} />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Router>
     </div>
   );
 }
 
-export default App;
+function App() {
+  return (
+    <I18nProvider>
+      <AuthProvider>
+        <StockProvider>
+          <AppContent />
+        </StockProvider>
+      </AuthProvider>
+    </I18nProvider>
+  );
+}
 
+export default App;
