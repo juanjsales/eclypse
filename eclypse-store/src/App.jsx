@@ -197,6 +197,24 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+
+        {/* Nova Secção: Sobre Nós */}
+        <section className="py-16 bg-card rounded-lg shadow-lg px-8 mb-12">
+          <h2 className="text-4xl font-extrabold text-center mb-8">Sobre a Eclypse</h2>
+          <div className="max-w-3xl mx-auto text-center text-lg text-muted-foreground leading-relaxed">
+            <p className="mb-4">
+              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground">slow fashion</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground">arte com as mãos</strong>.
+            </p>
+            <p className="mb-4">
+              A nossa inspiração vem da dualidade entre a luz e a sombra, o visível e o invisível, refletida nos fenómenos celestiais como os eclipses e as fases da lua. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
+            </p>
+            <p>
+              Comprometemo-nos com a sustentabilidade e a produção ética, garantindo que cada criação não só embeleza, mas também respeita o planeta e as pessoas. Junte-se a nós nesta jornada onde <strong className="text-foreground">o invisível molda o visível</strong>.
+            </p>
+          </div>
+        </section>
+
+        
         {/* Secção de Destaques/Novidades */}
         <section className="mb-12">
           <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
@@ -271,21 +289,7 @@ function App() {
           </div>
         </section>
 
-        {/* Nova Secção: Sobre Nós */}
-        <section className="py-16 bg-card rounded-lg shadow-lg px-8 mb-12">
-          <h2 className="text-4xl font-extrabold text-center mb-8">Sobre a Eclypse</h2>
-          <div className="max-w-3xl mx-auto text-center text-lg text-muted-foreground leading-relaxed">
-            <p className="mb-4">
-              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground">slow fashion</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground">arte com as mãos</strong>.
-            </p>
-            <p className="mb-4">
-              A nossa inspiração vem da dualidade entre a luz e a sombra, o visível e o invisível, refletida nos fenómenos celestiais como os eclipses e as fases da lua. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
-            </p>
-            <p>
-              Comprometemo-nos com a sustentabilidade e a produção ética, garantindo que cada criação não só embeleza, mas também respeita o planeta e as pessoas. Junte-se a nós nesta jornada onde <strong className="text-foreground">o invisível molda o visível</strong>.
-            </p>
-          </div>
-        </section>
+        
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
