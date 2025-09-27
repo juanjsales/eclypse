@@ -4,7 +4,7 @@ const products = [
     name: 'Eclipse Solar',
     description: 'Uma peça única inspirada na beleza e mistério do eclipse solar. Feita à mão com materiais sustentáveis.',
     price: 89.90,
-    image: '/src/assets/eclipse-solar.png',
+    image: '/assets/eclipse-solar.png',
     category: 'Coleção Eclipse'
   },
   {
