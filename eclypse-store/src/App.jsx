@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Sun, Moon, Search, X, Star, Filter, Grid, List } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './components/ui/sheet';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './components/ui/card';
 import { Input } from './components/ui/input';
 import { Badge } from './components/ui/badge';
 import { ProductModal } from './components/ProductModal';
-import productsData from './products'; // Importar os produtos do ficheiro products.js
+import { Cart } from './components/Cart'; // NOVO: Importar o novo componente Cart
+import productsData from './products'; 
 import './App.css';
 
 function App() {
@@ -14,7 +14,8 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Para o ProductModal
+  const [isCartOpen, setIsCartOpen] = useState(false); // NOVO: Estado para o Cart.jsx
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [viewMode, setViewMode] = useState('grid');
   const [toasts, setToasts] = useState([]);
@@ -49,6 +50,9 @@ function App() {
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
+  
+  const openCart = () => setIsCartOpen(true); // NOVO
+  const closeCart = () => setIsCartOpen(false); // NOVO
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -72,7 +76,7 @@ function App() {
 
   const updateQuantity = (productId, quantity) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) => (item.id === productId ? { ...item, quantity: quantity } : item))
+      prevItems.map((item) => (item.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item)) // Garante que a quantidade mínima é 1
     );
   };
 
@@ -82,39 +86,34 @@ function App() {
   
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
-
-    // 1. Formatar a lista de itens
+    
     const itemsText = cartItems.map(item =>
       `${item.quantity}x ${item.name} (Ref: ${item.id}) @€${item.price.toFixed(2)}`
     ).join('\n');
 
-    // 2. Calcular total
     const total = calculateTotal();
     
-    // 3. Montar a mensagem
     const message = 
       `Olá, gostaria de finalizar a minha compra na Eclypse!%0A%0A` +
       `*Detalhes do Pedido:*%0A${itemsText}%0A%0A` +
       `*Total:* €${total}%0A%0A` +
       `Agradeço a confirmação e detalhes de pagamento/envio.`;
 
-    // 4. Configurar o número de telefone (!!! SUBSTITUA COM O SEU NÚMERO REAL, INCLUINDO CÓDIGO DO PAÍS !!!)
     const phoneNumber = '351910000000'; 
     
-    // 5. Criar o URL e redirecionar
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
     window.open(whatsappUrl, '_blank');
     
-    // 6. Limpar o carrinho e mostrar notificação
     setCartItems([]); 
     addToast('Pedido iniciado! Redirecionando para o WhatsApp.', 'success');
+    closeCart(); // NOVO: Fechar o modal após o checkout
   };
 
 
   const categories = ['Todos', ...new Set(productsData.map(product => product.category))];
 
-  const featuredProducts = productsData.slice(0, 3); // Seleciona os 3 primeiros produtos como destaque
+  const featuredProducts = productsData.slice(0, 3);
 
   const filteredProducts = productsData.filter(
     (product) =>
@@ -136,7 +135,6 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="container mx-auto px-4 py-6 flex justify-between items-center border-b border-border">
-        {/* Título com o novo estilo gradiente (text-eclipse) */}
         <h1 className="text-4xl font-extrabold text-eclipse">Eclypse</h1>
         <nav className="flex items-center space-x-4">
           <div className="relative">
@@ -162,92 +160,20 @@ function App() {
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
           </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart size={24} />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                    {cartItems.reduce((total, item) => total + item.quantity, 0)}
-                  </span>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full sm:w-[400px] flex flex-col">
-              <SheetHeader>
-                <SheetTitle className="text-2xl">Carrinho de Compras</SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto py-4">
-                {cartItems.length === 0 ? (
-                  <p className="text-center text-muted-foreground">O seu carrinho está vazio.</p>
-                ) : (
-                  <ul className="space-y-4">
-                    {cartItems.map((item) => (
-                      <li key={item.id} className="flex items-center space-x-4">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                        <div className="flex-1">
-                          <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-muted-foreground text-sm">€{item.price.toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                          >
-                            -
-                          </Button>
-                          <span>{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
-                            +
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)}>
-                            <X size={16} />
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              {cartItems.length > 0 && (
-                <div className="border-t border-border pt-4">
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
-                    <span>€{calculateTotal()}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">Envio: Grátis</p>
-                  <Button className="w-full mt-4" onClick={handleCheckout}>Finalizar Compra</Button>
-                </div>
-              )}
-            </SheetContent>
-          </Sheet>
+          {/* NOVO BOTÃO: Abre o Cart.jsx */}
+          <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
+            <ShoppingCart size={24} />
+            {cartItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                {cartItems.reduce((total, item) => total + item.quantity, 0)}
+              </span>
+            )}
+          </Button>
         </nav>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-
-         {/* Secção "Sobre Nós" - Com Animação de Entrada (animate-fade-in-up) */}
-        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
-          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
-          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
-            <p className="mb-6">
-              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
-            </p>
-            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
-            <p className="mb-6">
-              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
-            </p>
-            <p className="font-bold text-2xl text-primary mt-8">
-              O invisível molda o visível.
-            </p>
-          </div>
-        </section>
-        {/* Secção de Destaques/Novidades */}
+        {/* ... Secção Destaques e Coleção permanecem as mesmas ... */}
         <section className="mb-12">
           <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -271,7 +197,6 @@ function App() {
                   </CardDescription>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center p-4 pt-0">
-                    {/* Botão com as classes relative e btn-eclipse */}
                   <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
                   <Button 
                         className="relative btn-eclipse"
@@ -319,7 +244,6 @@ function App() {
                   </CardDescription>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center p-4 pt-0">
-                    {/* Botão com as classes relative e btn-eclipse */}
                   <span className="text-2xl font-bold">€{product.price.toFixed(2)}</span>
                   <Button 
                         className="relative btn-eclipse"
@@ -333,12 +257,36 @@ function App() {
           </div>
         </section>
 
-       
+        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
+          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
+          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
+            <p className="mb-6">
+              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
+            </p>
+            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
+            <p className="mb-6">
+              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
+            </p>
+            <p className="font-bold text-2xl text-primary mt-8">
+              O invisível molda o visível.
+            </p>
+          </div>
+        </section>
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
         <p>&copy; {new Date().getFullYear()} Eclypse. Todos os direitos reservados.</p>
       </footer>
+
+      {/* NOVO COMPONENTE: Carrinho Modal */}
+      <Cart
+        isOpen={isCartOpen}
+        onClose={closeCart}
+        cart={cartItems}
+        updateQuantity={updateQuantity} // Passa a função de atualização de quantidade
+        removeFromCart={removeFromCart} // Passa a função de remoção
+        handleCheckout={handleCheckout} // Passa a função de checkout (WhatsApp)
+      />
 
       <ProductModal
         isOpen={isModalOpen}
