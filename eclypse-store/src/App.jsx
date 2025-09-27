@@ -80,8 +80,7 @@ function App() {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
   
-  // NOVA FUNÇÃO: Lidar com a finalização de compra e redirecionar para o WhatsApp
-  const handleCheckout = () => {
+  const handleCheckout = () => {
     if (cartItems.length === 0) return;
 
     // 1. Formatar a lista de itens
@@ -100,7 +99,7 @@ function App() {
       `Agradeço a confirmação e detalhes de pagamento/envio.`;
 
     // 4. Configurar o número de telefone (!!! SUBSTITUA COM O SEU NÚMERO REAL, INCLUINDO CÓDIGO DO PAÍS !!!)
-    const phoneNumber = '5521981756362'; 
+    const phoneNumber = '351910000000'; 
     
     // 5. Criar o URL e redirecionar
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -111,6 +110,7 @@ function App() {
     setCartItems([]); 
     addToast('Pedido iniciado! Redirecionando para o WhatsApp.', 'success');
   };
+
 
   const categories = ['Todos', ...new Set(productsData.map(product => product.category))];
 
@@ -136,7 +136,8 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="container mx-auto px-4 py-6 flex justify-between items-center border-b border-border">
-        <h1 className="text-3xl font-bold">Eclypse</h1>
+        {/* Título com o novo estilo gradiente */}
+        <h1 className="text-4xl font-extrabold text-eclipse">Eclypse</h1>
         <nav className="flex items-center space-x-4">
           <div className="relative">
             <Input
@@ -219,8 +220,7 @@ function App() {
                     <span>Total:</span>
                     <span>€{calculateTotal()}</span>
                   </div>
-                  
-                  {/* Botão com a nova função handleCheckout */}
+                  <p className="text-sm text-muted-foreground mt-1">Envio: Grátis</p>
                   <Button className="w-full mt-4" onClick={handleCheckout}>Finalizar Compra</Button>
                 </div>
               )}
@@ -230,22 +230,6 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Secção "Sobre Nós" - AGORA MAIS CHAMATIVA */}
-        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl">
-          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
-          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
-            <p className="mb-6">
-              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
-            </p>
-            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
-            <p className="mb-6">
-              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
-            </p>
-            <p className="font-bold text-2xl text-primary mt-8">
-              O invisível molda o visível.
-            </p>
-          </div>
-        </section>
         {/* Secção de Destaques/Novidades */}
         <section className="mb-12">
           <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
@@ -253,7 +237,8 @@ function App() {
             {featuredProducts.map((product) => (
               <Card
                 key={product.id}
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                {/* APLICANDO: card-eclipse */}
+                className="overflow-hidden shadow-lg transition-shadow duration-300 cursor-pointer card-eclipse"
                 onClick={() => openProductModal(product)}
               >
                 <CardHeader className="p-0">
@@ -295,7 +280,8 @@ function App() {
             {filteredProducts.map((product) => (
               <Card
                 key={product.id}
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                {/* APLICANDO: card-eclipse */}
+                className="overflow-hidden shadow-lg transition-shadow duration-300 cursor-pointer card-eclipse"
                 onClick={() => openProductModal(product)}
               >
                 <CardHeader className="p-0">
@@ -320,7 +306,23 @@ function App() {
           </div>
         </section>
 
-        
+        {/* Secção "Sobre Nós" - Com Animação de Entrada */}
+        {/* APLICANDO: animate-fade-in-up */}
+        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
+          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
+          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
+            <p className="mb-6">
+              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
+            </p>
+            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
+            <p className="mb-6">
+              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
+            </p>
+            <p className="font-bold text-2xl text-primary mt-8">
+              O invisível molda o visível.
+            </p>
+          </div>
+        </section>
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
