@@ -14,7 +14,7 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Para o ProductModal
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const [isCartOpen, setIsCartOpen] = useState(false); // NOVO: Estado para o Cart.jsx
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [viewMode, setViewMode] = useState('grid');
@@ -51,8 +51,8 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
   
-  const openCart = () => setIsCartOpen(true); // NOVO
-  const closeCart = () => setIsCartOpen(false); // NOVO
+  const openCart = () => setIsCartOpen(true); 
+  const closeCart = () => setIsCartOpen(false); 
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -76,7 +76,7 @@ function App() {
 
   const updateQuantity = (productId, quantity) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) => (item.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item)) // Garante que a quantidade mínima é 1
+      prevItems.map((item) => (item.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item))
     );
   };
 
@@ -107,14 +107,13 @@ function App() {
     
     setCartItems([]); 
     addToast('Pedido iniciado! Redirecionando para o WhatsApp.', 'success');
-    closeCart(); // NOVO: Fechar o modal após o checkout
+    closeCart(); // Fechar o modal após o checkout
   };
 
 
   const categories = ['Todos', ...new Set(productsData.map(product => product.category))];
-
   const featuredProducts = productsData.slice(0, 3);
-
+  
   const filteredProducts = productsData.filter(
     (product) =>
       (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -160,7 +159,6 @@ function App() {
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
           </Button>
-          {/* NOVO BOTÃO: Abre o Cart.jsx */}
           <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
             <ShoppingCart size={24} />
             {cartItems.length > 0 && (
@@ -173,8 +171,7 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        
-        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
+        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
           <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
           <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
             <p className="mb-6">
@@ -189,7 +186,7 @@ function App() {
             </p>
           </div>
         </section>
-        {/* ... Secção Destaques e Coleção permanecem as mesmas ... */}
+        {/* Secção de Destaques/Novidades */}
         <section className="mb-12">
           <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -273,20 +270,21 @@ function App() {
           </div>
         </section>
 
+        
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
         <p>&copy; {new Date().getFullYear()} Eclypse. Todos os direitos reservados.</p>
       </footer>
 
-      {/* NOVO COMPONENTE: Carrinho Modal */}
+      {/* COMPONENTE CART */}
       <Cart
         isOpen={isCartOpen}
         onClose={closeCart}
         cart={cartItems}
-        updateQuantity={updateQuantity} // Passa a função de atualização de quantidade
-        removeFromCart={removeFromCart} // Passa a função de remoção
-        handleCheckout={handleCheckout} // Passa a função de checkout (WhatsApp)
+        updateQuantity={updateQuantity} 
+        removeFromCart={removeFromCart} 
+        handleCheckout={handleCheckout} 
       />
 
       <ProductModal
