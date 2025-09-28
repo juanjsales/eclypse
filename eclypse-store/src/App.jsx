@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from './components/ui/input';
 import { Badge } from './components/ui/badge';
 import { ProductModal } from './components/ProductModal';
-import { Cart } from './components/Cart'; // NOVO: Importar o novo componente Cart
+import { Cart } from './components/Cart'; 
 import productsData from './products'; 
 import './App.css';
 
@@ -15,7 +15,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
-  const [isCartOpen, setIsCartOpen] = useState(false); // NOVO: Estado para o Cart.jsx
+  const [isCartOpen, setIsCartOpen] = useState(false); 
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [viewMode, setViewMode] = useState('grid');
   const [toasts, setToasts] = useState([]);
@@ -99,7 +99,7 @@ function App() {
       `*Total:* €${total}%0A%0A` +
       `Agradeço a confirmação e detalhes de pagamento/envio.`;
 
-    const phoneNumber = '351910000000'; 
+    const phoneNumber = '351910000000'; // Substitua pelo seu número real
     
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
@@ -107,7 +107,7 @@ function App() {
     
     setCartItems([]); 
     addToast('Pedido iniciado! Redirecionando para o WhatsApp.', 'success');
-    closeCart(); // Fechar o modal após o checkout
+    closeCart(); 
   };
 
 
@@ -171,22 +171,6 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
-          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
-          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
-            <p className="mb-6">
-              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
-            </p>
-            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
-            <p className="mb-6">
-              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
-            </p>
-            <p className="font-bold text-2xl text-primary mt-8">
-              O invisível molda o visível.
-            </p>
-          </div>
-        </section>
-        {/* Secção de Destaques/Novidades */}
         <section className="mb-12">
           <h2 className="text-4xl font-extrabold text-center mb-8">Destaques</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -270,7 +254,21 @@ function App() {
           </div>
         </section>
 
-        
+        <section className="py-20 mb-12 bg-gradient-to-br from-card/50 to-background/50 border-y border-primary/20 shadow-xl animate-fade-in-up">
+          <h2 className="text-5xl font-extrabold text-center mb-10 text-primary">Sobre a Eclypse</h2>
+          <div className="max-w-4xl mx-auto text-center text-xl text-muted-foreground leading-relaxed px-4">
+            <p className="mb-6">
+              Na Eclypse, acreditamos que a moda deve ser uma expressão de arte e consciência. Somos uma marca de <strong className="text-foreground text-2xl font-black">SLOW FASHION</strong>, dedicada a criar peças únicas e intemporais, feitas com paixão e <strong className="text-foreground text-2xl font-black">ARTE COM AS MÃOS</strong>.
+            </p>
+            <div className="h-0.5 w-24 bg-primary mx-auto my-8"></div>
+            <p className="mb-6">
+              A nossa inspiração vem da dualidade entre a luz e a sombra, refletida nos fenómenos celestiais. Cada peça é um convite a explorar a beleza do contraste e a profundidade do universo.
+            </p>
+            <p className="font-bold text-2xl text-primary mt-8">
+              O invisível molda o visível.
+            </p>
+          </div>
+        </section>
       </main>
 
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border">
