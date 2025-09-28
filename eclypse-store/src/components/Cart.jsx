@@ -4,25 +4,21 @@ import { Badge } from '@/components/ui/badge.jsx'
 import { Separator } from '@/components/ui/separator.jsx'
 import { X, Plus, Minus, ShoppingBag, CreditCard } from 'lucide-react'
 
-// Props alteradas: updateCart foi renomeado para updateQuantity, e handleCheckout foi adicionado
+// Recebe as funções de App.js via props
 export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, handleCheckout }) {
 
   const getTotalPrice = () => {
-    // Agora usa a quantidade diretamente do item do carrinho (prop 'cart')
     return cart.reduce((total, item) => {
       return total + (item.price * item.quantity)
     }, 0)
   }
 
   const getTotalItems = () => {
-    // Agora usa a quantidade diretamente do item do carrinho (prop 'cart')
     return cart.reduce((total, item) => {
       return total + item.quantity
     }, 0)
   }
 
-  // Não é necessário handleCheckout aqui, pois App.js passa a sua própria função.
-  // Se !isOpen, retorna null (mantém o comportamento de modal)
   if (!isOpen) return null
 
   return (
@@ -63,9 +59,8 @@ export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, ha
                   <Card key={item.id} className="border-border">
                     <CardContent className="p-4">
                       <div className="flex items-start space-x-4">
-                        {/* Simulação de Imagem/Placeholder */}
                         <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-lg" />
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-lg" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-sm">{item.name}</h3>
@@ -78,7 +73,6 @@ export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, ha
                                 variant="outline"
                                 size="sm"
                                 className="h-6 w-6 p-0"
-                                    // Usa a prop updateQuantity
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               >
                                 <Minus className="h-3 w-3" />
@@ -90,7 +84,6 @@ export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, ha
                                 variant="outline"
                                 size="sm"
                                 className="h-6 w-6 p-0"
-                                    // Usa a prop updateQuantity
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               >
                                 <Plus className="h-3 w-3" />
@@ -104,7 +97,6 @@ export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, ha
                                 variant="ghost"
                                 size="sm"
                                 className="text-xs text-destructive hover:text-red-700 p-0 h-auto"
-                                    // Usa o ID do item, conforme o App.js espera
                                 onClick={() => removeFromCart(item.id)} 
                               >
                                 Remover
@@ -138,5 +130,20 @@ export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, ha
                   <span>€{getTotalPrice().toFixed(2)}</span>
                 </div>
                 <Button 
-                  className="w-full relative btn-eclipse" // Aplicando o btn-eclipse para consistência
-                  onClick={handleCheckout} // Usa a função de checkout passada do App.js
+                  className="w-full relative btn-eclipse"
+                  onClick={handleCheckout} 
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Finalizar Compra
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Envio grátis para encomendas acima de €50
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
