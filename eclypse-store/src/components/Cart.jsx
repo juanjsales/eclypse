@@ -1,10 +1,10 @@
+import React from 'react';
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent } from '@/components/ui/card.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Separator } from '@/components/ui/separator.jsx'
 import { X, Plus, Minus, ShoppingBag, CreditCard } from 'lucide-react'
 
-// Recebe as funções de App.js via props
 export function Cart({ isOpen, onClose, cart, updateQuantity, removeFromCart, handleCheckout }) {
 
   const getTotalPrice = () => {
